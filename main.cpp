@@ -33,9 +33,9 @@ int serverSocket;
 char* deviceIp;
 
 static const char* html_form =
-"<html><body>PS-Tec Leser"
+"<html><body>Reader"
 "<form method=\"POST\" action=\"/handle_post_request\">"
-"CDI IP-Addresse: <input type=\"text\" name=\"input_1\" /> <br/>"
+"Server IP-Addresse: <input type=\"text\" name=\"input_1\" /> <br/>"
 "DeviceIP: <input type=\"text\" name=\"input_2\" /> <br/>"
 "<input type=\"submit\" />"
 "</form></body></html>";
@@ -72,16 +72,16 @@ static int begin_request_handler(struct mg_connection* conn)
             //"input_2: [%s]\n",
             post_data_len, post_data, post_data_len, input1 /* input2 */);
 
-        char* cdiIp = new char[post_data_len - 8];
+        char* serverIp = new char[post_data_len - 8];
         for (int i = 8; i < post_data_len; i++)
         {
-            cdiIp[i - 8] = post_data[i];
+            serverIp[i - 8] = post_data[i];
         }
 
         deviceIp = new char[post_data_len - 8];
         for (int i = 8; i < post_data_len; i++)
         {
-            cdiIp[i - 8] = post_data[i];
+            serverIp[i - 8] = post_data[i];
         }
 
         std::ofstream config{ "config.txt" };
@@ -187,21 +187,21 @@ int main()
     struct sockaddr_in server;
     unsigned long addr;
 
-    char* cdiIp;
-    while (cdiIp == nullptr)
+    char* serverIp;
+    while (serverIp == nullptr)
     {
-        string cdiIpStr;
+        string serverIpStr;
         ifstream config("config.txt");
         if (config.is_open())
         {
-            while (getline(config, cdiIpStr))
+            while (getline(config, serverIpStr))
             {
-                cout << cdiIpStr << '\n';
+                cout << serverIpStr << '\n';
             }
             config.close();
 
-            cdiIp = new char[cdiIpStr.length() + 1];
-            strcpy(cdiIp, cdiIpStr.c_str());
+            serverIp = new char[sereverIpStr.length() + 1];
+            strcpy(serverIp, serverIpStr.c_str());
         }
         else cout << "Unable to open file for write" << endl;
 
