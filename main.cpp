@@ -1,5 +1,3 @@
-﻿// placeholder
-
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -39,9 +37,9 @@ bool bSettingsChanged = false;
 char* deviceIp;
 
 static const char* html_form =
-"<html><body>PS-Tec Leser"
+"<html><body>Reader"
 "<form method=\"POST\" action=\"/handle_post_request\">"
-"CDI IP-Addresse: <input type=\"text\" name=\"input_1\" /> <br/>"
+"Server IP-Address: <input type=\"text\" name=\"input_1\" /> <br/>"
 "DeviceIP: <input type=\"text\" name=\"input_2\" /> <br/>"
 "DevicePort: <input type=\"text\" name=\"input_3\" /> <br/>"
 "<input type=\"submit\" />"
@@ -80,7 +78,7 @@ int writeToConfig(vector <char*> dataArray)
 static int begin_request_handler(struct mg_connection* conn)
 {
     const struct mg_request_info* ri = mg_get_request_info(conn);
-    char post_data[1024], cdiIp[sizeof(post_data)], deviceIp[sizeof(post_data)], devicePort[sizeof(post_data)];
+    char post_data[1024], serverIp[sizeof(post_data)], deviceIp[sizeof(post_data)], devicePort[sizeof(post_data)];
     int post_data_len;
 
     if (!strcmp(ri->local_uri, "/handle_post_request")) {
@@ -88,7 +86,7 @@ static int begin_request_handler(struct mg_connection* conn)
         post_data_len = mg_read(conn, post_data, sizeof(post_data));
 
         // Parse form data. input1 and input2 are guaranteed to be NUL-terminated
-        mg_get_var(post_data, post_data_len, "input_1", cdiIp, sizeof(cdiIp));
+        mg_get_var(post_data, post_data_len, "input_1", serverIp, sizeof(serverIp));
         mg_get_var(post_data, post_data_len, "input_2", deviceIp, sizeof(deviceIp));
 		mg_get_var(post_data, post_data_len, "input_3", devicePort, sizeof(devicePort));
 
@@ -103,7 +101,7 @@ static int begin_request_handler(struct mg_connection* conn)
 
 		while (1)
 		{
-			vector <char*> dataArray = { cdiIp, deviceIp, devicePort };
+			vector <char*> dataArray = { serverIp, deviceIp, devicePort };
 			int writeResult = writeToConfig(dataArray);
 			if (writeResult == 0) break;
 		}
